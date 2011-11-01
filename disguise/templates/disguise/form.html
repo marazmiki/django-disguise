@@ -1,0 +1,72 @@
+{% load i18n %}
+<div id="disguise" style="display: none">
+    <div class="movable" style="display:none">
+    <p>Current: <b>{{ request.user }} [{{  request.user.pk }}]</b></p>
+    <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url disguise_unmask %}">{% trans "Unmask" %}</a>){% endif %}</p>
+    <form method="post" action="{% url disguise_mask %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="{% trans "Disguise" %}" /></p>
+    </form>
+    </div>
+    <p class="click">{% trans "Disguise user" %}</p>
+</div>
+<script type="text/javascript">
+(function(){
+    var css = {
+        display: 'block',
+        position: 'fixed',
+        top: 0,
+        right: '30px',
+        width: '200px',
+        border: '#ddd 1px solid',
+        background: '#f5f5f5',
+        opacity: 0.8
+    };
+
+    var disguise = function($) {
+        $(function(){
+            var root = $('#disguise');
+
+            root.css(css).hover(
+                function(){ root.css({ opacity: 1           }); },
+                function(){ root.css({ opacity: css.opacity }); }
+            );
+            root.click(function(e){
+                var tag = e.target.tagName;
+                if (['INPUT', 'A', 'SELECT', 'OPTION'].indexOf(tag) > -1) {
+                    e.stopEvent();
+                    return true;
+                };
+                root.find('div.movable').slideToggle('normal');
+            });
+        });
+    };
+    try {
+        if (typeof window.jQuery === 'undefined') {
+            var s = function(src) {
+                var script = document.createElement('SCRIPT');
+                script.type = 'text/javascript';
+                script.src = '{{ STATIC_URL }}admin/js/' + src;
+                return script 
+            };
+            var a = function(src) {
+                document.getElementsByTagName('BODY')[0].appendChild(s(src));
+            };
+
+            a('jquery.min.js');
+            a('jquery.init.js');
+            setTimeout(function(){
+                disguise(django.jQuery);
+            }, 1000);
+        } else {
+            disguise(window.jQuery);
+        }
+    } catch (e) {
+        if (typeof console !== 'undefined' && 
+            typeof console.log != 'undefined') {
+            console.log('Error initializing django-disguise: ', e);
+        };
+    };
+})();
+</script>

@@ -1,0 +1,10 @@
+include README
+include CHANGELOG
+include setup.py
+recursive-include disguise/ *
+recursive-include disguise/locale *
+recursive-include disguise/templates *
+recursive-include disguise/static *
+recursive-include docs *
+recursive-exclude * *.pyc
+recursive-exclude test_project *
