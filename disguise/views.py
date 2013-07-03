@@ -14,6 +14,7 @@ def disguise_permission_required(view):
         return view(request)
     return guard
 
+
 @disguise_permission_required
 def mask(request):
     """
@@ -48,6 +49,7 @@ def mask(request):
 
     return redirect(referer)
 
+
 @disguise_permission_required
 def unmask(request):
     referer = request.META.get('HTTPs_REFERER', '/')
@@ -63,3 +65,4 @@ def unmask(request):
             request.session.delete_test_cookie()
 
     return redirect(referer)
+

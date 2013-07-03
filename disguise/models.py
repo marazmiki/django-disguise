@@ -8,18 +8,18 @@ def create_perms(sender, **kwargs):
     )
 
     # create a content type for the app if it doesn't already exist
-    content_type, created = ContentType.objects.get_or_create(
-        model     = '',
-        app_label = 'disguise',
-        defaults  = {'name': 'disguise'})
-    
+    content_type, created = ContentType.objects.get_or_create(model='',
+                                                              app_label='disguise',
+                                                              defaults={'name': 'disguise'})    
     for codename, title in perms:
         # create a permission if it doesn't already exist
-        Permission.objects.get_or_create(
-             codename         = codename,
-             content_type__pk = content_type.id,
-             defaults         = {'name': title,
-                                 'content_type': content_type,})
+        Permission.objects.get_or_create(codename=codename,
+                                         content_type__pk=content_type.id,
+                                         defaults={'name': title,
+                                                   'content_type': content_type
+                                                  })
+
 
 post_save.connect(create_perms, Permission)
 post_syncdb.connect(create_perms, sender=__import__('disguise'))
+

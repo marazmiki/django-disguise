@@ -92,3 +92,4 @@ class DisguiseMiddleware(object):
                 smart_unicode(html + TAGNAME)       # Replace
             )
         return response
+

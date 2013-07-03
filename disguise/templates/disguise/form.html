@@ -2,8 +2,8 @@
 <div id="disguise" style="display: none">
     <div class="movable" style="display:none">
     <p>Current: <b>{{ request.user }} [{{  request.user.pk }}]</b></p>
-    <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url disguise_unmask %}">{% trans "Unmask" %}</a>){% endif %}</p>
-    <form method="post" action="{% url disguise_mask %}">
+    <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url 'disguise_unmask' %}">{% trans "Unmask" %}</a>){% endif %}</p>
+    <form method="post" action="{% url 'disguise_mask' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <p><input type="submit" value="{% trans "Disguise" %}" /></p>
@@ -27,7 +27,6 @@
     var disguise = function($) {
         $(function(){
             var root = $('#disguise');
-
             root.css(css).hover(
                 function(){ root.css({ opacity: 1           }); },
                 function(){ root.css({ opacity: css.opacity }); }
@@ -70,3 +69,4 @@
     };
 })();
 </script>
+

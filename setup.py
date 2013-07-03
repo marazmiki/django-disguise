@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 from setuptools import setup, find_packages
 import os
-version = '0.0.1b'
+version = '0.0.2b'
 CLASSIFIERS=[
     'Development Status :: 4 - Beta',
     'Environment :: Web Environment',
@@ -21,7 +21,7 @@ setup(
     author_email = 'marazmiki@gmail.com',
     url = 'http://pypi.python.org/pypi/django-disguise',
     download_url = 'http://bitbucket.org/marazmiki/django-disguise/get/tip.zip',
-    description = 'App that allows to superuser to "disguise" into any user',
+    description = 'This django application allows superuser to "disguise" into any user',
     long_description = open(os.path.join(os.path.dirname(__file__), 'README')).read(),
     license = 'MIT license',
     platforms=['OS Independent'],

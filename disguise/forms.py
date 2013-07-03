@@ -1,17 +1,23 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()  
+except ImportError:
+    from django.contrib.auth.models import User
+
 
 class DisguiseForm(forms.Form):
     """
     Disguise form
     """
     username = forms.CharField(label=_('User name'),
-        required = False)
+                              required=False)
     user_id = forms.IntegerField(label=_('User ID'),
-        required = False)
+                                 required=False)
     update_last_login = forms.BooleanField(label=_('Update last login'),
-        required = False)
+                                           required = False)
 
     def clean_username(self):
         """
@@ -25,7 +31,7 @@ class DisguiseForm(forms.Form):
 
         if len(qset) == 1:
             return qset[0]
-        raise forms.ValidationError, _('No such username')
+        raise forms.ValidationError(_('No such username'))
 
     def clean_user_id(self):
         """
@@ -39,14 +45,14 @@ class DisguiseForm(forms.Form):
 
         if len(qset) == 1:
             return qset[0]
-        raise forms.ValidationError, _('No such user id')
+        raise forms.ValidationError(_('No such user id'))
 
     def clean(self):
         """
         Clears whole form totally
         """
         if not getattr(self, 'cleaned_data'):
-            raise forms.ValidationError, _('No such username or user id')
+            raise forms.ValidationError(_('No such username or user id'))
         return self.cleaned_data
 
     def get_user(self):
@@ -61,4 +67,5 @@ class DisguiseForm(forms.Form):
             if not isinstance(user, User):
                 continue
             return user
-        raise ValueError, 'Cannot retrieve user'
+        raise ValueError('Cannot retrieve user')
+
