@@ -27,7 +27,7 @@ setup(
     url='http://pypi.python.org/pypi/django-disguise',
     download_url='http://bitbucket.org/marazmiki/django-disguise/get/tip.zip',
     description='This django application allows superuser to "disguise" into any user',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README')).read(),
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     license='MIT license',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
