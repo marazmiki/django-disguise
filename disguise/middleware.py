@@ -8,6 +8,12 @@ import warnings
 
 
 try:
+    from django.utils.encoding import smart_unicode
+except ImportError:
+    from django.utils.encoding import smart_text as smart_unicode
+
+
+try:
     from django.contrib.auth import get_user_model
 except ImportError:
     from django.contrib.auth.models import User
