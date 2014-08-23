@@ -3,8 +3,12 @@
 
 from setuptools import setup, find_packages
 import os
-version = '0.0.2b'
-CLASSIFIERS=[
+
+
+version = '0.0.3'
+
+
+CLASSIFIERS = [
     'Development Status :: 4 - Beta',
     'Environment :: Web Environment',
     'Intended Audience :: Developers',
@@ -14,20 +18,21 @@ CLASSIFIERS=[
     'Framework :: Django'
 ]
 
+
 setup(
-    name = 'django-disguise',
-    author = 'marazmiki',
-    version = version,
-    author_email = 'marazmiki@gmail.com',
-    url = 'http://pypi.python.org/pypi/django-disguise',
-    download_url = 'http://bitbucket.org/marazmiki/django-disguise/get/tip.zip',
-    description = 'This django application allows superuser to "disguise" into any user',
-    long_description = open(os.path.join(os.path.dirname(__file__), 'README')).read(),
-    license = 'MIT license',
+    name='django-disguise',
+    author='marazmiki',
+    version=version,
+    author_email='marazmiki@gmail.com',
+    url='http://pypi.python.org/pypi/django-disguise',
+    download_url='http://bitbucket.org/marazmiki/django-disguise/get/tip.zip',
+    description='This django application allows superuser to "disguise" into any user',
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README')).read(),
+    license='MIT license',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     packages=find_packages(exclude=['test_project', 'test_project.*']),
+    test_suite='tests.main',
     include_package_data=True,
-    zip_safe = False
+    zip_safe=False
 )
-

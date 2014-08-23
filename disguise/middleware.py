@@ -1,14 +1,19 @@
+# coding: utf-8
+
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
+from django.contrib.auth import get_user_model
 from disguise.forms import DisguiseForm
 import warnings
+
 
 KEYNAME = 'django_disguise:original_user'
 TAGNAME = '</body>'
 
+
 def replace_insensitive(string, target, replacement):
-    """ 
+    """
     Similar to string.replace() but is case insensitive
     Code borrowed from: http://forums.devshed.com/python-programming-11/case-insensitive-string-replace-490921.html
     """
@@ -16,7 +21,7 @@ def replace_insensitive(string, target, replacement):
     index = no_case.rfind(target.lower())
     if index >= 0:
         return string[:index] + replacement + string[index + len(target):]
-    else: # no results so return the original string
+    else:  # no results so return the original string
         return string
 
 
@@ -39,7 +44,7 @@ class DisguiseMiddleware(object):
 
     def get_original_user(self, request):
         if KEYNAME in request.session:
-            return request.session[KEYNAME]
+            return get_user_model().objects.get(pk=request.session[KEYNAME])
         return request.user
 
     def process_request(self, request):
@@ -81,8 +86,8 @@ class DisguiseMiddleware(object):
             # Render HTML code that helps to select disguise
             html = render_to_string('disguise/form.html', {
                 'form': DisguiseForm(),
-                'original_user' : getattr(request, 'original_user', None),
-                'disguise_user' : getattr(request, 'user'),
+                'original_user': getattr(request, 'original_user', None),
+                'disguise_user': getattr(request, 'user'),
             }, RequestContext(request))
 
             # Insert this code before </body>
@@ -92,4 +97,3 @@ class DisguiseMiddleware(object):
                 smart_unicode(html + TAGNAME)       # Replace
             )
         return response
-

@@ -1,17 +1,19 @@
 from django import test
 from django.conf import settings
+from django.conf.urls import patterns
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from disguise import urls
+
 
 class EnvironmentTest(test.TestCase):
     def test_request_context_processors(self):
         """
         Tests that request context processor is enabled
         """
-        assert 'django.core.context_processors.request' in \
-        settings.TEMPLATE_CONTEXT_PROCESSORS
+        assert ('django.core.context_processors.request' in
+                settings.TEMPLATE_CONTEXT_PROCESSORS)
 
     def test_session_app_enabled(self):
         """
@@ -23,15 +25,15 @@ class EnvironmentTest(test.TestCase):
         """
         Tests that django session middleware is enabled
         """
-        assert 'django.contrib.sessions.middleware.SessionMiddleware' in \
-        settings.MIDDLEWARE_CLASSES
+        assert ('django.contrib.sessions.middleware.SessionMiddleware' in
+                settings.MIDDLEWARE_CLASSES)
 
     def test_middleware_disguise_enabled(self):
         """
         Tests that disguise middleware is enabled
         """
-        assert 'disguise.middleware.DisguiseMiddleware' in \
-        settings.MIDDLEWARE_CLASSES
+        assert ('disguise.middleware.DisguiseMiddleware' in
+                settings.MIDDLEWARE_CLASSES)
 
     def test_middleware_disguiseorder(self):
         """
@@ -39,14 +41,16 @@ class EnvironmentTest(test.TestCase):
         """
         idx = settings.MIDDLEWARE_CLASSES.index
 
-        assert idx('django.contrib.sessions.middleware.SessionMiddleware') < \
-               idx('disguise.middleware.DisguiseMiddleware')  
+        assert (idx('django.contrib.sessions.middleware.SessionMiddleware') <
+                idx('disguise.middleware.DisguiseMiddleware'))
+
 
 class DisguiseTest(test.TestCase):
     urls = 'disguise.tests.urls'
-    
+
     def patch_urls(self):
-        urls.urlpatterns += urls.patterns('',
+        urls.urlpatterns += patterns(
+            '',
             (r'^$', lambda request: render(request, 'disguise/tests/index.html')),
         )
 
@@ -72,7 +76,7 @@ class DisguiseTest(test.TestCase):
         # Disguise to regular user
         resp = self.client.post(self.url_mask, data={'username': 'jane'}, follow=True)
         self.assertEquals(self.jane, resp.context['request'].user)
-        self.assertEquals(self.john, resp.context['request'].original_user )
+        self.assertEquals(self.john, resp.context['request'].original_user)
 
         # Disguise to superuser again
         resp = self.client.post(self.url_mask, data={'username': 'john'}, follow=True)
@@ -110,7 +114,10 @@ class DisguiseTest(test.TestCase):
         """
         self.client.login(username='john', password='smith')
         was = self.jane.last_login
-        resp = self.client.post(self.url_mask, data={'user_id': '2', 'update_last_login':'1'}, follow=True)
+        resp = self.client.post(self.url_mask,
+                                data={'user_id': '2',
+                                      'update_last_login': '1'},
+                                follow=True)
         self.assertNotEquals(was, resp.context['request'].user.last_login)
 
     def test_not_update_last_login(self):
@@ -121,7 +128,7 @@ class DisguiseTest(test.TestCase):
         was = self.jane.last_login
         resp = self.client.post(self.url_mask, data={'user_id': '2'}, follow=True)
         self.assertTrue(was < resp.context['request'].user.last_login)
-    
+
     def test_permission_required(self):
         """
         Tests that regular user can't disguise

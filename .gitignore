@@ -1,7 +1,9 @@
+htmlcov/
 .env/
 .hg/
 .hgignore
 *.swp
 *.pyc
+.coverage
 dist/
 *.egg-info/

@@ -5,6 +5,7 @@ from disguise.forms import DisguiseForm
 from disguise.middleware import KEYNAME
 import datetime
 
+
 def disguise_permission_required(view):
     def guard(request):
         if not getattr(request, 'original_user', None):
@@ -23,11 +24,11 @@ def mask(request):
     referer = request.META.get('HTTP_REFERER', '/')
     form = DisguiseForm(request.POST or None)
 
-    if form.is_valid():   
+    if form.is_valid():
         # if not hasattr(request,'original_user') or request.original_user is None:
         if KEYNAME not in request.session:
             request.original_user = request.user
-            request.session[KEYNAME] = request.original_user
+            request.session[KEYNAME] = request.original_user.pk
 
         # Okay, security checks complete. Log the user in.
         new_user = form.get_user()
@@ -52,12 +53,12 @@ def mask(request):
 
 @disguise_permission_required
 def unmask(request):
-    referer = request.META.get('HTTPs_REFERER', '/')
+    referer = request.META.get('HTTP_REFERER', '/')
 
-    if hasattr(request, 'original_user'): 
+    if hasattr(request, 'original_user'):
         # Okay, security checks complete. Log the user in.
         new_user = request.original_user
-        new_user.backend = 'django.contrib.auth.backends.ModelBackend' 
+        new_user.backend = 'django.contrib.auth.backends.ModelBackend'
 
         login(request, new_user)
 
@@ -65,4 +66,3 @@ def unmask(request):
             request.session.delete_test_cookie()
 
     return redirect(referer)
-

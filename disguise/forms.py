@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 try:
     from django.contrib.auth import get_user_model
-    User = get_user_model()  
+    User = get_user_model()
 except ImportError:
     from django.contrib.auth.models import User
 
@@ -13,11 +13,11 @@ class DisguiseForm(forms.Form):
     Disguise form
     """
     username = forms.CharField(label=_('User name'),
-                              required=False)
+                               required=False)
     user_id = forms.IntegerField(label=_('User ID'),
                                  required=False)
     update_last_login = forms.BooleanField(label=_('Update last login'),
-                                           required = False)
+                                           required=False)
 
     def clean_username(self):
         """
@@ -68,4 +68,3 @@ class DisguiseForm(forms.Form):
                 continue
             return user
         raise ValueError('Cannot retrieve user')
-
