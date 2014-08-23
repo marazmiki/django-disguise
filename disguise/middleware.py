@@ -3,9 +3,15 @@
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
-from django.contrib.auth import get_user_model
 from disguise.forms import DisguiseForm
 import warnings
+
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    from django.contrib.auth.models import User
+    get_user_model = lambda: User
 
 
 KEYNAME = 'django_disguise:original_user'
