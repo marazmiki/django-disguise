@@ -2,15 +2,14 @@
 
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.utils.encoding import smart_unicode
 from disguise.forms import DisguiseForm
 import warnings
 
 
 try:
-    from django.utils.encoding import smart_unicode
+    from django.utils.encoding import smart_unicode as smart_text
 except ImportError:
-    from django.utils.encoding import smart_text as smart_unicode
+    from django.utils.encoding import smart_text
 
 
 try:
@@ -104,8 +103,8 @@ class DisguiseMiddleware(object):
 
             # Insert this code before </body>
             response.content = replace_insensitive(
-                smart_unicode(response.content),    # Subject
-                TAGNAME,                            # Search
-                smart_unicode(html + TAGNAME)       # Replace
+                smart_text(response.content),     # Subject
+                TAGNAME,                          # Search
+                smart_text(html + TAGNAME)        # Replace
             )
         return response
