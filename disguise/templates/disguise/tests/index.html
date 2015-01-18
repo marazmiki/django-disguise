@@ -1,1 +1,13 @@
-It is a Index document, {{ user.username}}
+{% load disguise_tags %}<!doctype html>
+<html>
+  <head>
+    <title>test app</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div>
+      <p>It is a Index document, <b>{{ user.username }}</b></p>
+      {% disguise_widget %}
+    </div>
+  </body>
+</html>

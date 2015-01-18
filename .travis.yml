@@ -8,10 +8,10 @@ python:
 
 
 env:
-  - DJANGO=django==1.4.15
-  - DJANGO=django==1.5.10
-  - DJANGO=django==1.6.7
-  - DJANGO=django==1.7
+  - DJANGO=django==1.4.18
+  - DJANGO=django==1.5.13
+  - DJANGO=django==1.6.10
+  - DJANGO=django==1.7.3
 
 
 matrix:
@@ -33,7 +33,7 @@ before_script:
   - make flake8
 
 script:
-  - make test
+  - make coverage
 
 after_success:
   - make coveralls

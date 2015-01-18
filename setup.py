@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 import os
 
 
-version = '0.0.3'
+version = '0.1.0.b'
 
 
 CLASSIFIERS = [
@@ -15,19 +15,26 @@ CLASSIFIERS = [
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
     'Framework :: Django'
 ]
 
 
+def long_description():
+    with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as fp:
+        return fp.read()
+
 setup(
     name='django-disguise',
-    author='marazmiki',
+    author='Mikhail Porokhovnichenko',
     version=version,
     author_email='marazmiki@gmail.com',
-    url='http://pypi.python.org/pypi/django-disguise',
-    download_url='http://bitbucket.org/marazmiki/django-disguise/get/tip.zip',
-    description='This django application allows superuser to "disguise" into any user',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
+    url='https://github.com/marazmiki/django-disguise',
+    description=('This django application allows superuser to '
+                 '"disguise" into any user'),
+    long_description=long_description(),
     license='MIT license',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,

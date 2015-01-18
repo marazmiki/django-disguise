@@ -1,26 +1,31 @@
+# coding: utf-8
+
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, post_syncdb
+from django.utils.translation import ugettext_lazy as _
+from disguise.compat import get_user_model
 
 
 def create_perms(sender, **kwargs):
     perms = (
-        ('can_disguise', 'Can disguise'),
+        ('can_disguise', _('Can disguise')),
     )
 
-    # create a content type for the app if it doesn't already exist
-    content_type, created = ContentType.objects.get_or_create(
-        model='',
-        app_label='disguise',
-        defaults={'name': 'disguise'})
+    content_type = ContentType.objects.get_for_model(get_user_model())
+
     for codename, title in perms:
-        # create a permission if it doesn't already exist
-        Permission.objects.get_or_create(codename=codename,
-                                         content_type__pk=content_type.id,
-                                         defaults={
-                                             'name': title,
-                                             'content_type': content_type
-                                         })
+        Permission.objects.get_or_create(
+            codename=codename,
+            content_type=content_type,
+            defaults={
+                'name': title,
+            })
+
 
 post_save.connect(create_perms, Permission)
 post_syncdb.connect(create_perms, sender=__import__('disguise'))

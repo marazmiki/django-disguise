@@ -1,38 +1,45 @@
 {% load i18n %}
-{% load url from future %}
-<div id="disguise" style="display: none">
+{% load staticfiles %}
+
+{% if can_disguise %}
+  <!-- disguise widget -->
+  <div id="disguise" style="display: none">
     <div class="movable" style="display:none">
-    <p>Current: <b>{{ request.user }} [{{  request.user.pk }}]</b></p>
-    <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url 'disguise_unmask' %}">{% trans "Unmask" %}</a>){% endif %}</p>
-    <form method="post" action="{% url 'disguise_mask' %}">
+      <p>Current: <b>{{ request.user }} [{{  request.user.pk }}]</b></p>
+      <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url 'disguise_unmask' %}">{% trans "Unmask" %}</a>){% endif %}</p>
+      <form method="post" action="{% url 'disguise_mask' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <p><input type="submit" value="{% trans "Disguise" %}" /></p>
-    </form>
+      </form>
     </div>
     <p class="click">{% trans "Disguise user" %}</p>
-</div>
-<script type="text/javascript">
+  </div>
+  <script type="text/javascript">
 (function(){
-    var css = {
-        display: 'block',
-        position: 'fixed',
-        top: 0,
-        right: '30px',
-        width: '200px',
-        border: '#ddd 1px solid',
-        background: '#f5f5f5',
-        opacity: 0.8
-    };
+  var
+    css = {
+      display: 'block',
+      position: 'fixed',
+      top: 0,
+      right: '30px',
+      width: '200px',
+      border: '#ddd 1px solid',
+      background: '#f5f5f5',
+      opacity: 0.8
+    },
 
-    var disguise = function($) {
-        $(function(){
-            var root = $('#disguise');
-            root.css(css).hover(
-                function(){ root.css({ opacity: 1           }); },
-                function(){ root.css({ opacity: css.opacity }); }
-            );
-            root.click(function(e){
+    disguise = function($) {
+      $(function(){
+        var root = $('#disguise');
+        root
+          .css(css)
+          .hover(
+            function(){root.css({opacity: 1});},
+            function(){root.css({opacity: css.opacity});}
+        );
+        root
+          .click(function(e){
                 var tag = e.target.tagName;
                 if (['INPUT', 'A', 'SELECT', 'OPTION'].indexOf(tag) > -1) {
                     e.stopEvent();
@@ -70,4 +77,4 @@
     };
 })();
 </script>
-
+{% endif %}

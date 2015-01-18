@@ -1,36 +1,37 @@
+# coding: utf-8
+
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from disguise.compat import get_user_model
 
-try:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-except ImportError:
-    from django.contrib.auth.models import User
+
+User = get_user_model()
 
 
 class DisguiseForm(forms.Form):
     """
     Disguise form
     """
-    username = forms.CharField(label=_('User name'),
-                               required=False)
-    user_id = forms.IntegerField(label=_('User ID'),
-                                 required=False)
-    update_last_login = forms.BooleanField(label=_('Update last login'),
-                                           required=False)
+    username = forms.CharField(label=_('User name'), required=False)
+    user_id = forms.IntegerField(label=_('User ID'), required=False)
 
     def clean_username(self):
         """
         Cleans username field
         """
         username = self.cleaned_data.get('username')
+
         if not username:
             return None
 
         qset = User.objects.filter(username=username)
 
-        if len(qset) == 1:
-            return qset[0]
+        if qset.exists():
+            return qset.get()
         raise forms.ValidationError(_('No such username'))
 
     def clean_user_id(self):
@@ -43,16 +44,21 @@ class DisguiseForm(forms.Form):
             return None
         qset = User.objects.filter(pk=user_id)
 
-        if len(qset) == 1:
-            return qset[0]
+        if qset.exists():
+            return qset.get()
         raise forms.ValidationError(_('No such user id'))
 
     def clean(self):
         """
         Clears whole form totally
         """
-        if not getattr(self, 'cleaned_data'):
-            raise forms.ValidationError(_('No such username or user id'))
+        cleaned_data = getattr(self, 'cleaned_data', {})
+
+        if not cleaned_data.get('user_id') and \
+                not cleaned_data.get('username'):
+            raise forms.ValidationError(
+                _('Please enter either username or user id')
+            )
         return self.cleaned_data
 
     def get_user(self):
@@ -67,4 +73,3 @@ class DisguiseForm(forms.Form):
             if not isinstance(user, User):
                 continue
             return user
-        raise ValueError('Cannot retrieve user')
