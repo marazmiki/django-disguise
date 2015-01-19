@@ -21,5 +21,5 @@ except (ImportError, AssertionError):
     class Checks(object):
         class Error(object):
             def __init__(self, message, hint='', error='', id=''):
-                raise ImproperlyConfigured(message, code=id)
+                raise ImproperlyConfigured(message, id)
     checks = Checks()
