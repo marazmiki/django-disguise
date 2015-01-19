@@ -8,7 +8,7 @@ from django import test, get_version
 from django.db.models.signals import post_save, post_syncdb
 from django.conf.urls import include, url
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Permission
 from django.shortcuts import render
 from disguise.compat import get_user_model
@@ -133,10 +133,10 @@ class TestForm(test.TestCase):
 
 class DisguiseTest(test.TestCase):
     urls = 'disguise.tests'
-    mask_url = reverse_lazy('disguise_mask')
-    unmask_url = reverse_lazy('disguise_unmask')
 
     def setUp(self):
+        self.mask_url = reverse('disguise_mask')
+        self.unmask_url = reverse('disguise_unmask')
         self.root = User.objects.create_superuser(
             username='root',
             password='root',
