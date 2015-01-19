@@ -14,11 +14,12 @@ except ImportError:
 
 try:
     from django.core import checks
-except ImportError:
+    assert hasattr(checks, 'Error')
+except (ImportError, AssertionError):
     from django.core.exceptions import ImproperlyConfigured
 
     class Checks(object):
         class Error(object):
-            def __init__(self, message, hint='', error=''):
-                raise ImproperlyConfigured(message)
+            def __init__(self, message, hint='', error='', id=''):
+                raise ImproperlyConfigured(message, code=id)
     checks = Checks()
