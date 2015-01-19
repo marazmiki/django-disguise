@@ -5,7 +5,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 from django import test, get_version
-from django.db.models.signals import post_save, post_syncdb
+from django.db.models.signals import post_save
 from django.conf.urls import include, url
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -51,11 +51,6 @@ class TestTemplateTag(test.TestCase):
 
 class TestPermissions(test.TestCase):
     perm = Permission.objects.filter(codename='can_disguise')
-
-    def test_post_syncdb(self):
-        self.assertFalse(self.perm.exists())
-        post_syncdb.send(sender=__import__('disguise'))
-        self.perm.get()
 
     def test_post_save_permission(self):
         self.assertFalse(self.perm.exists())
