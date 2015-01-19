@@ -65,7 +65,7 @@ class TestPermissions(test.TestCase):
 
 class TestCheck(test.TestCase):
     def assertError(self, code):
-        if get_version() >= '1.6':
+        if get_version() >= '1.7':
             for er in check_env():
                 if er.id == code:
                     return
