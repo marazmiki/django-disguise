@@ -175,12 +175,14 @@ class DisguiseTest(test.TestCase):
         self.assertEquals(200, resp.status_code)
         self.assertEquals(self.user, resp.context['request'].user)
         self.assertEquals(self.root, resp.context['request'].original_user)
+        self.assertContains(resp, '<form ')
 
         # Disguise to superuser again
         resp = self.mask_request(username='root', follow=True)
         self.assertEquals(200, resp.status_code)
         self.assertEquals(self.root, resp.context['request'].original_user)
         self.assertEquals(self.root, resp.context['request'].user)
+        self.assertContains(resp, '<form ')
 
     def test_unmask(self):
         self.mask_request(username='user', follow=True)
