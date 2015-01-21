@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 from django import get_version
 from django.conf import settings
-
 import sys
 import os
 
@@ -12,11 +15,12 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
 settings.configure(
-    ROOT_URLCONF='disguise.tests.urls',
+    ROOT_URLCONF='disguise.tests',
     INSTALLED_APPS=(
         'django.contrib.contenttypes',
         'django.contrib.auth',
         'django.contrib.sessions',
+        'django.contrib.staticfiles',
         'disguise',
     ),
     TEMPLATE_CONTEXT_PROCESSORS = (

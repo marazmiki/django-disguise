@@ -1,68 +1,73 @@
+# coding: utf-8
+
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import redirect
-from django.contrib.auth import login, SESSION_KEY, BACKEND_SESSION_KEY
+from django.contrib.auth import login
+from django.views.generic import View, FormView
 from disguise.forms import DisguiseForm
-from disguise.middleware import KEYNAME
-import datetime
+from disguise.const import KEYNAME, SESSION_KEY, BACKEND_SESSION_KEY, BACKEND
+from disguise.utils import can_disguise
+from disguise.signals import disguise_applied, disguise_disapplied
 
 
-def disguise_permission_required(view):
-    def guard(request):
-        if not getattr(request, 'original_user', None):
-            if not request.user.has_perm('disguise.can_disguise'):
-                return redirect_to_login(request)
-            return redirect_to_login(request.get_full_path())
-        return view(request)
-    return guard
+class DisguiseMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        if not can_disguise(request):
+            return redirect_to_login(request)
+        return super(DisguiseMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_http_referer(self):
+        return self.request.META.get('HTTP_REFERER', '/')
+
+    def test_cookie(self):
+        if self.request.session.test_cookie_worked():
+            self.request.session.delete_test_cookie()
 
 
-@disguise_permission_required
-def mask(request):
-    """
-    Disguise
-    """
-    referer = request.META.get('HTTP_REFERER', '/')
-    form = DisguiseForm(request.POST or None)
+class MaskView(DisguiseMixin, FormView):
+    form_class = DisguiseForm
 
-    if form.is_valid():
-        # if not hasattr(request,'original_user') or request.original_user is None:
+    def switch_user(self, user):
+        self.request.session[SESSION_KEY] = user.id
+        self.request.session[BACKEND_SESSION_KEY] = user.backend
+        self.request.user = user
+
+    def form_valid(self, form):
+        request = self.request
         if KEYNAME not in request.session:
             request.original_user = request.user
             request.session[KEYNAME] = request.original_user.pk
 
         # Okay, security checks complete. Log the user in.
         new_user = form.get_user()
-        new_user.backend = 'django.contrib.auth.backends.ModelBackend'
+        new_user.backend = BACKEND
 
         # Change current user
-        request.session[SESSION_KEY] = new_user.id
-        request.session[BACKEND_SESSION_KEY] = new_user.backend
+        self.switch_user(new_user)
+        self.test_cookie()
 
-        if hasattr(request, 'user'):
-            request.user = new_user
-
-        if request.session.test_cookie_worked():
-            request.session.delete_test_cookie()
-
-        if 'update_last_login' in form.cleaned_data:
-            request.user.last_login = datetime.datetime.now()
-            request.user.save()
-
-    return redirect(referer)
+        disguise_applied.send(sender=new_user.__class__,
+                              original_user=request.original_user,
+                              new_user=new_user)
+        return redirect(self.get_http_referer())
 
 
-@disguise_permission_required
-def unmask(request):
-    referer = request.META.get('HTTP_REFERER', '/')
+class UnmaskView(DisguiseMixin, View):
+    def get(self, request, *args, **kwargs):
+        if hasattr(request, 'original_user'):
+            # Okay, security checks complete. Log the user in.
+            old_user = request.user
+            new_user = request.original_user
+            new_user.backend = BACKEND
 
-    if hasattr(request, 'original_user'):
-        # Okay, security checks complete. Log the user in.
-        new_user = request.original_user
-        new_user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, new_user)
 
-        login(request, new_user)
-
-        if request.session.test_cookie_worked():
-            request.session.delete_test_cookie()
-
-    return redirect(referer)
+            disguise_disapplied.send(sender=new_user.__class__,
+                                     original_user=request.original_user,
+                                     old_user=old_user)
+        self.test_cookie()
+        return redirect(self.get_http_referer())
