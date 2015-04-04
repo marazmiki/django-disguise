@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.2
+---
+
+* Add django 1.8 support
+
 0.1
 ---
 
