@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.0.2
+-----
+
+* UPadte head django==1.8 version
+
+0.2.1
+-----
+
+* Update head django versions
+
 0.2
 ---
 
