@@ -1,6 +1,8 @@
 build/
 htmlcov/
-.env/
+.tox/
+.env
+.virtualenv/
 .hg/
 .hgignore
 *.swp
