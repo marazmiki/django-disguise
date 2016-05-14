@@ -6,7 +6,7 @@ from __future__ import absolute_import
 from __future__ import division
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_syncdb
+from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 from disguise.compat import get_user_model
 
@@ -26,6 +26,10 @@ def create_perms(sender, **kwargs):
                 'name': title,
             })
 
+signals.post_save.connect(create_perms, Permission)
 
-post_save.connect(create_perms, Permission)
-post_syncdb.connect(create_perms, sender=__import__('disguise'))
+try:
+    sender = __import__('disguise')
+    signals.post_syncdb.connect(create_perms, sender=sender)
+except AttributeError:
+    signals.post_migrate.connect(create_perms, sender=sender)
