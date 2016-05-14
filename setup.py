@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 import os
 
 
-version = '0.2.2'
+version = '0.2.3'
 
 
 CLASSIFIERS = [
@@ -17,6 +17,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
     'Framework :: Django'
 ]
 
