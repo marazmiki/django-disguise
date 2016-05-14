@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.2.3
+-----
+
+* Use ``tox`` for testing
+* Drop suuport for ``Django==1.4``
+
+
 0.2.2
 -----
 
