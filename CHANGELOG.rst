@@ -1,7 +1,7 @@
 Changes
 =======
 
-0.0.2
+0.2.2
 -----
 
 * UPadte head django==1.8 version
