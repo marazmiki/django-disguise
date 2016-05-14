@@ -23,7 +23,7 @@ settings.configure(
         'django.contrib.staticfiles',
         'disguise',
     ),
-    TEMPLATE_CONTEXT_PROCESSORS = (
+    TEMPLATE_CONTEXT_PROCESSORS=(
         'django.core.context_processors.request',
     ),
     MIDDLEWARE_CLASSES=(
