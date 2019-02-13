@@ -6,5 +6,8 @@ recursive-include disguise/locale *
 recursive-include disguise/templates *
 recursive-include disguise/static *
 recursive-include docs *
+
 recursive-exclude * *.pyc
+recursive-exclude .tox *
 recursive-exclude test_project *
+recursive-exclude example_project *
