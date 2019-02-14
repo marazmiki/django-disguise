@@ -1,12 +1,6 @@
-# coding: utf-8
-
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
 from django.contrib.auth.views import redirect_to_login
-from django.shortcuts import redirect
 from django.contrib.auth import login
+from django.shortcuts import redirect
 from django.views.generic import View, FormView
 from disguise.forms import DisguiseForm
 from disguise.const import KEYNAME, SESSION_KEY, BACKEND_SESSION_KEY, BACKEND
@@ -28,30 +22,37 @@ class DisguiseMixin(object):
             self.request.session.delete_test_cookie()
 
 
+def swap_user(request, old_user, new_user):
+    if KEYNAME not in request.session:
+        request.original_user = old_user
+        request.session[KEYNAME] = request.original_user.pk
+
+    new_user.backend = BACKEND
+
+    request.session[SESSION_KEY] = new_user.id
+    request.session[BACKEND_SESSION_KEY] = new_user.backend
+
+    login(request, new_user)
+
+    if request.session.test_cookie_worked():
+        request.session.delete_test_cookie()
+    if KEYNAME not in request.session:
+        request.original_user = request.user
+        request.session[KEYNAME] = request.original_user.pk
+
+
+
 class MaskView(DisguiseMixin, FormView):
     form_class = DisguiseForm
 
-    def switch_user(self, user):
-        self.request.session[SESSION_KEY] = user.id
-        self.request.session[BACKEND_SESSION_KEY] = user.backend
-        self.request.user = user
-
     def form_valid(self, form):
-        request = self.request
-        if KEYNAME not in request.session:
-            request.original_user = request.user
-            request.session[KEYNAME] = request.original_user.pk
-
-        # Okay, security checks complete. Log the user in.
+        old_user = self.request.user
         new_user = form.get_user()
-        new_user.backend = BACKEND
-
-        # Change current user
-        self.switch_user(new_user)
-        self.test_cookie()
-
+        swap_user(request=self.request,
+                  old_user=old_user,
+                  new_user=new_user)
         disguise_applied.send(sender=new_user.__class__,
-                              original_user=request.original_user,
+                              original_user=old_user,
                               new_user=new_user)
         return redirect(self.get_http_referer())
 

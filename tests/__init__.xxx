@@ -1,15 +1,10 @@
-# coding: utf-8
-
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
+import pytest
 from django import test, get_version
-from django.db.models.signals import post_save
 from django.conf.urls import include, url
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Permission
+from django.core.exceptions import ImproperlyConfigured
+
+from django.db.models.signals import post_save
 from django.shortcuts import render
 from disguise.compat import get_user_model
 from disguise.forms import DisguiseForm
@@ -17,45 +12,54 @@ from disguise.signals import disguise_applied, disguise_disapplied
 from disguise.utils import check_env
 
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
+
 User = get_user_model()
 
 
-class TestTemplateTag(test.TestCase):
-    url = '/'
-
-    def setUp(self):
-        self.root = User.objects.create_superuser(username='root',
-                                                  password='root',
-                                                  email='root@example.com')
-        self.user = User.objects.create_user(username='user',
-                                             password='user',
-                                             email='user@example.com')
-        self.client = test.Client()
-        self.client.login(username='root', password='root')
-
-    def test_anonymous(self):
-        self.client.logout()
-        resp = self.client.get(self.url)
-        self.assertNotContains(resp, '<form ')
-
-    def test_regular_user(self):
-        self.client.logout()
-        self.client.login(username='user', password='user')
-        resp = self.client.get(self.url)
-        self.assertNotContains(resp, '<form ')
-
-    def test_superuser(self):
-        resp = self.client.get(self.url)
-        self.assertContains(resp, '<form ')
+@pytest.fixture
+def url():
+    return '/'
 
 
-class TestPermissions(test.TestCase):
-    perm = Permission.objects.filter(codename='can_disguise')
+@pytest.fixture
+def super_user():
+    return get_user_model().objects.create_superuser(username='root',
+                                                     password='root',
+                                                     email='root@example.com')
 
-    def test_post_save_permission(self):
-        self.assertFalse(self.perm.exists())
-        post_save.send(sender=Permission)
-        self.perm.get()
+@pytest.fixture
+def regular_user():
+    return get_user_model().objects.create_user(username='user',
+                                                password='user',
+                                                email='user@example.com')
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    argnames='name, should',
+    argvalues=[
+        ('', False),
+        ('regular_user', False),
+        ('super_user', True),
+    ]
+)
+def test_if_user_can_see_disquise_form(django_client, url, name, should, request):
+    django_client.logout()
+    if name:
+        django_client.force_login(user=request.getfixturevalue(name))
+    assert '<form ' in django_client.get(url).content is should
+
+
+@pytest.mark.django_db
+def test_permission():
+    qs = Permission.objects.filter(codename='can_disguise')
+    assert not qs.exists()
+    post_save.send(sender=Permission)
+    assert qs.exists()
 
 
 class TestCheck(test.TestCase):
@@ -241,14 +245,3 @@ class DisguiseTest(test.TestCase):
         disguise_disapplied.disconnect(handler, sender=User,
                                        dispatch_uid='test')
         del self._entered
-
-
-def index(request):
-    return render(request, 'disguise/tests/index.html')
-
-
-urlpatterns = [
-    url(r'^disguise/', include('disguise.urls')),
-    url(r'^accounts/login/$', index),
-    url(r'^$', index),
-]

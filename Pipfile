@@ -9,8 +9,13 @@ pytest = "*"
 pytest-django = "*"
 pytest-isort = "*"
 pytest-flake8 = "*"
+pytest-env = "*"
+pytest-pythonpath = "*"
 
 [packages]
+django = "*"
+dj-database-url = "*"
+python-decouple = "*"
 
 [requires]
 python_version = "3.7"

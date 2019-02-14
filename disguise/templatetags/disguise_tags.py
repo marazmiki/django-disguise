@@ -8,6 +8,7 @@ register = template.Library()
 
 @register.inclusion_tag('disguise/form.html', takes_context=True)
 def disguise_widget(context):
+    print("fsdfs", context)
     request = context['request']
     context.update({
         'can_disguise': can_disguise(request),

@@ -58,13 +58,7 @@ class DisguiseForm(forms.Form):
 
     def get_user(self):
         """
-        Returns selected user object
+        Returns a selected user instance
         """
         assert self.is_valid()
-
-        for field in ['username', 'user_id']:
-            user = self.cleaned_data.get(field)
-
-            if not isinstance(user, User):
-                continue
-            return user
+        return next((v for k, v in self.cleaned_data.items()), None)
