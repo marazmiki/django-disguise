@@ -1,4 +1,5 @@
-from django.apps import AppConfig
+from django.apps import AppConfig, apps
+from django.db.models.signals import post_migrate, post_save
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -7,37 +8,13 @@ class DisguiseConfig(AppConfig):
     verbose_name = _('Disguise')
 
     def ready(self):
-        """
+        from .utils import create_perms
 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import signals
-from django.utils.translation import ugettext_lazy as _
-from disguise.compat import get_user_model
-
-
-def create_perms(sender, **kwargs):
-    perms = (
-        ('can_disguise', _('Can disguise')),
-    )
-
-    content_type = ContentType.objects.get_for_model(get_user_model())
-
-    for codename, title in perms:
-        Permission.objects.get_or_create(
-            codename=codename,
-            content_type=content_type,
-            defaults={
-                'name': title,
-            })
-
-signals.post_save.connect(create_perms, Permission)
-
-try:
-    sender = __import__('disguise')
-    signals.post_syncdb.connect(create_perms, sender=sender)
-except AttributeError:
-    signals.post_migrate.connect(create_perms, sender=sender)
-
-
-"""
+        post_migrate.connect(
+            create_perms,
+            sender=__import__('disguise')
+        )
+        post_save.connect(
+            create_perms,
+            sender=apps.get_model('auth.Permission')
+        )

@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture(autouse=True)
 def autouse_db(db):
     "make use a database connection all over the test cases"
@@ -14,6 +15,7 @@ def super_user(django_user_model):
         password='root',
         email='root@example.com'
     )
+
 
 @pytest.fixture
 def regular_user(django_user_model):

@@ -1,66 +1,64 @@
 from django.conf import settings
-from disguise.const import KEYNAME
-from disguise.compat import checks
+from django.core import checks
+
+SESSIONS_APP = 'django.contrib.sessions'
+SESSIONS_MIDDLEWARE = 'django.contrib.sessions.middleware.SessionMiddleware'
+DISGUISE_MIDDLEWARE = 'disguise.middleware.DisguiseMiddleware'
+REQUEST_CONTEXT_PROCESSOR = 'django.template.context_processors.request'
+
+
+def sessions_app_installed():
+    return SESSIONS_APP in settings.INSTALLED_APPS
+
+
+def sessions_middleware_installed():
+    return SESSIONS_MIDDLEWARE in settings.MIDDLEWARE
+
+
+def disguise_middlware_installed():
+    return DISGUISE_MIDDLEWARE in settings.MIDDLEWARE
+
+
+def request_context_processor_installed():
+    return any((
+        REQUEST_CONTEXT_PROCESSOR
+        in t.get('OPTIONS', {}).get('context_processors')
+        for t in settings.TEMPLATES
+    ))
+
+
+def middleware_right_order():
+    idx = settings.MIDDLEWARE.index
+    try:
+        return idx(SESSIONS_MIDDLEWARE) < idx(DISGUISE_MIDDLEWARE)
+    except ValueError:
+        return False
 
 
 def check_env():
-    middleware_list = settings.MIDDLEWARE
-    context_processors = settings.TEMPLATES[0]['OPTIONS']['context_processors']  # _CONTEXT_PROCESSORS
-
-    idx = middleware_list.index
-
-    # Checks if `django.contrib.sessions` application installed
-    sessions_app_installed = ('django.contrib.sessions' in
-                              settings.INSTALLED_APPS)
-
-    # Checks if `django.core.context_processors.request` added
-    # into TEMPLATE_CONTEXT_PROCESSORS tuple
-    cp_name = 'django.template.context_processors.request'
-#    cp_name = 'django.core.context_processors.request'  # old way
-
-    context_processors = (cp_name in
-                          context_processors)
-
-    # Checks if sessions middleware is added into MIDDLEWARE_CLASSES
-    sessions_middleware_installed = (
-        'django.contrib.sessions.middleware.SessionMiddleware'
-        in middleware_list
-    )
-
-    # Checks if disguise middleware is added into MIDDLEWARE_CLASSES
-    disguise_middleware_installed = ('disguise.middleware.DisguiseMiddleware'
-                                     in middleware_list)
-
-    # Checks if sessions middleware installed before disguise one
-    try:
-        middleware_order = (
-            idx('django.contrib.sessions.middleware.SessionMiddleware') <
-            idx('disguise.middleware.DisguiseMiddleware')
-        )
-    except ValueError:
-        middleware_order = False
-
     errors = []
 
-    if not sessions_app_installed:
+    if not sessions_app_installed():
         errors.append(
             checks.Error(
-                'Django sessions app is *not* installed',
+                'The "django.contrib.sessions" application isn\'t installed',
                 id='disguise.E001',
                 hint=('Add the `django.contrib.sessions` into '
                       'your INSTALLED_APPS setting')
             )
         )
-    if not context_processors:
+    if not request_context_processor_installed():
         errors.append(
             checks.Error(
-                'There is no `request` variable in template context',
+                'There is no "request" variable in template context',
                 id='disguise.E002',
-                hint=('Add the django.core.context_processors.request into '
-                      'your TEMPLATE_CONTEXT_PROCESSORS setting')
+                hint=(
+                    'Add the {0} into your TEMPLATE_CONTEXT_PROCESSORS '
+                    'setting'.format(REQUEST_CONTEXT_PROCESSOR)
+                )
             )
         )
-    if not sessions_middleware_installed:
+    if not sessions_middleware_installed():
         errors.append(
             checks.Error(
                 'Session middleware is *NOT* installed',
@@ -69,7 +67,7 @@ def check_env():
                       'Middleware` into your MIDDLEWARE_CLASSES setting')
             )
         )
-    if not disguise_middleware_installed:
+    if not disguise_middlware_installed():
         errors.append(
             checks.Error(
                 'Disguise middleware is *NOT* installed',
@@ -78,7 +76,7 @@ def check_env():
                       'into your MIDDLEWARE_CLASSES setting')
             )
         )
-    if not middleware_order:
+    if not middleware_right_order():
         errors.append(
             checks.Error(
                 'Session middleware must be installed before disguise one',

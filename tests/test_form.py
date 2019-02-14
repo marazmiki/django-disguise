@@ -1,5 +1,6 @@
 from disguise.forms import DisguiseForm
 
+
 def test_form_invalid_everything():
     form = DisguiseForm({})
     assert not form.is_valid()

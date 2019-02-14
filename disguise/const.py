@@ -1,4 +1,4 @@
-from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
+from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY
 
 KEYNAME = 'django_disguise:original_user'
 TAGNAME = 'body'

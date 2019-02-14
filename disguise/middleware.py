@@ -1,17 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.utils.deprecation import MiddlewareMixin
-from disguise.compat import get_user_model
+
 from disguise.const import KEYNAME
 from disguise.utils import can_disguise
 
 
-def is_auth(user):
-    return user.is_authenticated if not callable(user.is_authenticated) else user.is_authenticated()
-
 class DisguiseMiddleware(MiddlewareMixin):
-    """
-    Disguise user middleware
-    """
-
     def get_original_user(self, request):
         if KEYNAME in request.session:
             return get_user_model().objects.get(pk=request.session[KEYNAME])
@@ -21,7 +15,7 @@ class DisguiseMiddleware(MiddlewareMixin):
         """
         Injects the `original_user` attribute into HttpRequest object
         """
-        if not is_auth(request.user):
+        if not request.user.is_authenticated:
             return
         if not can_disguise(request):
             return
