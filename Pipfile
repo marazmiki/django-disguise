@@ -17,6 +17,7 @@ django = "*"
 dj-database-url = "*"
 python-decouple = "*"
 gunicorn = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.7"
