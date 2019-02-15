@@ -16,6 +16,7 @@ pytest-pythonpath = "*"
 django = "*"
 dj-database-url = "*"
 python-decouple = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

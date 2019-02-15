@@ -1,1 +1,2 @@
-web: gunicorn
+web: gunicorn example_project.wsgi
+
