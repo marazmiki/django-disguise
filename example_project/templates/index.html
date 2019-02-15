@@ -1,15 +1,33 @@
-{% load disguise_tags %}<!doctype html>
-<html>
-  <head>
-    <title>test app</title>
-    <meta charset="utf-8">
-  </head>
-  <body>
-    <div>
-      <p>It is a Index document, <b>{{ user.username }}</b></p>
-      <!-- a disguise widget, where are you? -->
-      {% disguise_widget %}
-      <!-- here I am -->
-    </div>
-  </body>
-</html>
+{% extends "base.html" %}
+{% load disguise_tags %}
+
+{% block content %}
+  {% disguise_widget %}
+  <h2>Users here</h2>
+  <p>
+  {% if user.is_authenticated %}
+    Hi, <b>{{ user.first_name }} {{ user.last_name }}</b> aka <b>@{{ user.username }}</b>
+    (<a href="{% url 'logout' %}">logout</a>)
+  {% else %}
+    Well, you aren&apos;t logged yet. Will you?
+  {% endif %}
+  </p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+	<th>Real name</th>
+	<th>Username</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>@{{ user.username }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock content %}

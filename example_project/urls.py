@@ -1,3 +1,5 @@
+from django.contrib.auth.views import LoginView, logout_then_login
+
 from .views import index
 
 try:
@@ -8,4 +10,8 @@ except ImportError:
 urlpatterns = [
     re_path(r'^disguise/', include('disguise.urls')),
     re_path(r'^$', index),
+    re_path(r'^logout/$', logout_then_login, name='logout'),
+    re_path(r'^login/$', LoginView.as_view(
+        template_name='login.html'
+    ), name='login'),
 ]
