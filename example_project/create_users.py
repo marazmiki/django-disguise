@@ -3,11 +3,6 @@ import random
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'example_project.settings')
 
-from django import setup
-from django.contrib.auth import get_user_model
-
-setup()
-
 first_names = [
     'Charlie', 'Dennis', 'Dee', 'Frank', 'Ronald', 'Lyam', 'Margaret', 'Bill',
     'Barry', 'Michael', 'George', 'Buster', 'George Michael', 'Gob', 'Lucille',
@@ -19,6 +14,8 @@ last_names = [
 
 
 def user_exists(username):
+    from django.contrib.auth import get_user_model  # noqa
+
     return get_user_model().objects.filter(username=username).exists()
 
 
@@ -33,10 +30,16 @@ def create_random_person():
         'last_name': last_name,
         'email': email,
         'username': username,
+        'password': 'demo',
     }
 
 
 def create_some_users(number):
+    from django import setup  # noqa
+    from django.contrib.auth import get_user_model  # noqa
+
+    setup()
+
     User = get_user_model()
     created = 0
 
@@ -46,9 +49,9 @@ def create_some_users(number):
             password='admin',
             email='admin@example.com'
         )
- 
+
     while 42:
-        row = create_random_person() 
+        row = create_random_person()
         if not user_exists(row['username']):
             User.objects.create_user(**row)
             created += 1

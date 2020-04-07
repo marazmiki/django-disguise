@@ -16,8 +16,9 @@
     <thead>
       <tr>
         <th>ID</th>
-	<th>Real name</th>
-	<th>Username</th>
+        <th>Real name</th>
+        <th>Username</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -26,6 +27,13 @@
         <td>{{ user.id }}</td>
         <td>{{ user.first_name }} {{ user.last_name }}</td>
         <td>@{{ user.username }}</td>
+        <td>
+          {% if request|can_disguise %}
+            <a href="{% url 'disguise_mask' pk=user.id %}"><i class="fas fa-mask"></i> @{{ user.username }}</a>
+          {% else %}
+            no perms
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>

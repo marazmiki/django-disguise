@@ -1,10 +1,10 @@
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 
 {% if can_disguise %}
   <!-- disguise widget -->
-  <div id="disguise" style="display: none">
-    <div class="movable" style="display:none">
+  <div id="disguise" style="_display: none">
+    <div class="movable" style="_display:none">
       <p>Current: <b>{{ request.user }} [{{  request.user.pk }}]</b></p>
       <p>Orignal: <b>{{ request.original_user|default:request.user }} [{{request.original_user.pk}}]</b>{% if request.original_user != request.user %} (<a href="{% url 'disguise_unmask' %}">{% trans "Unmask" %}</a>){% endif %}</p>
       <form method="post" action="{% url 'disguise_mask' %}">
@@ -15,7 +15,51 @@
     </div>
     <p class="click">{% trans "Disguise user" %}</p>
   </div>
-  <script type="text/javascript">
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const Loader = {
+    require (scripts, callback) {
+      this.loadCount = 0;
+      this.callback = callback;
+      this.totalRequired  = scripts.length;
+      scripts.forEach((src) => {
+        this.writeScript(src)
+      });
+    },
+    loaded (evt) {
+      this.loadCount++;
+      if (this.loadCount === this.totalRequired && typeof this.callback == 'function') {
+        this.callback.call();
+      }
+    },
+    writeScript (src) {
+      const s = document.createElement('script');
+      s.src = src;
+      s.addEventListener('load', (e) => {
+        this.loaded(e);
+      }, false);
+      document.querySelector('HEAD').appendChild(s);
+    }
+  };
+
+  const disguise = ($) => {
+    console.log('Disguise loaded', $)
+  }
+
+  if (window.jQuery) {
+    disguise(window.jQuery);
+  } else if (window.django && window.django.jQuery) {
+    disguise(window.django.jQuery);
+  } else {
+    Loader.require([
+      '{% static "admin/js/jquery.min.js" %}',
+      '{% static "admin/js/jquery.init.js" %}',
+    ], () => {
+      console.log('ok, loaded jquery from admin')
+      disguise(django.jQuery)
+    })
+  }
+});
 (function(){
   var
     css = {
@@ -49,13 +93,14 @@
             });
         });
     };
+/*
     try {
         if (typeof window.jQuery === 'undefined') {
             var s = function(src) {
                 var script = document.createElement('SCRIPT');
                 script.type = 'text/javascript';
                 script.src = '{{ STATIC_URL }}admin/js/' + src;
-                return script 
+                return script
             };
             var a = function(src) {
                 document.getElementsByTagName('BODY')[0].appendChild(s(src));
@@ -70,11 +115,12 @@
             disguise(window.jQuery);
         }
     } catch (e) {
-        if (typeof console !== 'undefined' && 
+        if (typeof console !== 'undefined' &&
             typeof console.log != 'undefined') {
             console.log('Error initializing django-disguise: ', e);
         };
     };
+    */
 })();
 </script>
 {% endif %}

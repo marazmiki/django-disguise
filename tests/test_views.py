@@ -2,7 +2,13 @@ from contextlib import contextmanager
 
 import pytest
 
-from disguise.signals import disguise_applied, disguise_disapplied
+from disguise.signals import disguise_applied, disguise_removed
+
+
+@pytest.fixture(autouse=True)
+def fix_settings(settings):
+    settings.DISGUISE['can_disguise'] = ('example_project.stuff.'
+                                         'test_can_disguise')
 
 
 @pytest.fixture
@@ -19,7 +25,7 @@ def mask_url():
 @pytest.fixture
 def unmask_url():
     "A URL that drops the mask from a user off"
-    return '/disguise/unmask/'
+    return '/disguise/remove/'
 
 
 @contextmanager
@@ -55,7 +61,7 @@ def test_if_user_can_see_disquise_form(
 def test_anonymous_access(client, regular_user, mask_url):
     client.logout()
     resp = client.post(mask_url, {'username': regular_user.username})
-    assert resp.status_code == 302
+    assert resp.status_code == 403
 
 
 def test_non_privilegied_access(
@@ -63,7 +69,7 @@ def test_non_privilegied_access(
 ):
     client.force_login(regular_user)
     resp = client.post(mask_url, {'username': super_user.username})
-    assert resp.status_code == 302
+    assert resp.status_code == 403
 
 
 def test_mask_myself(client, mask_url, super_user, regular_user):
@@ -125,6 +131,6 @@ def test_signal_diguise_disapplied(client, super_user, regular_user, mask_url):
         # self.assertEquals(original_user, self.root)
         # self.assertEquals(old_user, self.user)
 
-    with catch_signal(disguise_disapplied, diguise_disapplied_handler):
+    with catch_signal(disguise_removed, diguise_disapplied_handler):
         resp = client.post(mask_url, {'user_id': regular_user.id}, follow=True)
         assert resp.context['request'].original_user == super_user

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -46,3 +46,7 @@ class DisguiseForm(forms.Form):
         """
         assert self.is_valid()
         return next((v for k, v in self.cleaned_data.items() if v), None)
+
+
+def get_disguise_form_class():
+    return DisguiseForm

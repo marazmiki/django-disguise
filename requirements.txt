@@ -1,0 +1,7 @@
+# N.B.: Actually, this file is needed only for deploying a demo side on Heroku.
+
+Django
+dj-database-url
+python-decouple
+psycopg2-binary
+gunicorn

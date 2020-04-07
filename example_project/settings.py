@@ -66,3 +66,7 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/'
+
+DISGUISE = {
+    'can_disguise': 'example_project.stuff.my_own_can_disguise',
+}

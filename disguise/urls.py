@@ -1,8 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 
-from disguise.views import MaskView, UnmaskView
+from .views import Mask, MaskById, Unmask
 
 urlpatterns = [
-    url(r'^$', MaskView.as_view(), name='disguise_mask'),
-    url(r'^unmask/$', UnmaskView.as_view(), name='disguise_unmask'),
+    path('', Mask.as_view(), name='disguise_mask'),
+    path('<int:pk>/', MaskById.as_view(), name='disguise_mask'),
+    path('remove/', Unmask.as_view(), name='disguise_unmask'),
 ]
