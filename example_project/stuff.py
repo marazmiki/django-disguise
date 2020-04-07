@@ -1,6 +1,5 @@
 def my_own_can_disguise(request):
-    print('!!!', request.user)
-    return request.user.last_name.lower() == 'bluth'
+    return getattr(request.user, 'last_name', '').lower() == 'bluth'
 
 
 def test_can_disguise(request):
