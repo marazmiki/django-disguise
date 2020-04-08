@@ -8,12 +8,10 @@
 </head>
 <body>
   <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-secondary border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal">django-disguise</h5>
+    <h5 class="my-0 mr-md-auto font-weight-normal">
+      <a class="btn btn-outline-white" href="/">django-disguise</a>
+    </h5>
     {% include 'theater-masks-solid.svg' %}
-    <nav class="my-2 my-md-0 mr-md-3">
-      <a class="p-2 text-dark" href="#">Support</a>
-      <a class="p-2 text-dark" href="#">Pricing</a>
-    </nav>
     {% if request.user.is_authenticated %}
       Hi, {{ request.user }}.
       <a class="btn btn-outline-white" href="{% url 'logout' %}">{{ _('sign out') }}</a>
@@ -23,7 +21,14 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     {% include 'github.html' %}
   </div>
-  <div class="container">{% block content %}{% endblock %}</div>
+  <div class="container">
+    {% for message in messages %}
+      <div class="alert alert-success {{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+
+
+    {% block content %}{% endblock %}
+  </div>
   <div>
     <p class="">
       <small>Icons powered by font awesome</small><br>

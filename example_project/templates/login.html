@@ -1,43 +1,80 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-{% if form.errors and not form.non_field_errors %}
-<p class="errornote">
-{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
-</p>
-{% endif %}
+  <style scoped>
+    b.username {
+      border-bottom: #ccc 1px dashed;
+      color: #888;
+      cursor: pointer;
+    }
+  </style>
 
-{% if form.non_field_errors %}
-  {% for error in form.non_field_errors %}
-    <p class="errornote">{{ error }}</p>
-  {% endfor %}
-{% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Please identify yourself</h4>
+        {% if form.errors and not form.non_field_errors %}
+        <div class="alert alert-error" role="alert">
+          {% if form.errors.items|length == 1 %}
+            {{ _("Please correct the error below.") }}
+          {% else %}
+            {{ _("Please correct the errors below.") }}
+          {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <p class="errornote">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      {% endif %}
 
-<div id="content-main">
-  <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-    <div class="form-row">
-      {{ form.username.errors }}
-      {{ form.username.label_tag }} {{ form.username }}
+      <form action="{{ app_path }}" method="post" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="form-group">
+          <label for="id_username">{{ form.username.label }}</label>
+          <input type="text" id="id_username" name="username" aria-describedby="usernameHelp" autocomplete="off">
+          <small id="usernameHelp" class="form-text text-muted">See notes about it somewhere near...</small>
+        </div>
+
+        <div class="form-group">
+          <label for="id_password">{{ form.password.label }}</label>
+          <input type="password"  id="id_password" name="password" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary">{{ _('Log in') }}</button>
+      </form>
+
+
     </div>
-    <div class="form-row">
-      {{ form.password.errors }}
-      {{ form.password.label_tag }} {{ form.password }}
-      <input type="hidden" name="next" value="{{ next }}">
-    </div>
-
-    <div class="submit-row">
-      <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}">
-    </div>
-  </form>
-
-  <div>
-    <h2>A minute o</h2>
+    <div class="col-sm">
+    <h4>A young hacker guide</h4>
     <ul>
-      <li>Enter <b>admin</b> as username and <b>admin</b> as password to log in as a superuser</li>
-      <li>For the rest users password is <b>demo</b></li>
+      <li>To login as a superuser, use <b class="username" data-pass="admin">admin</b> both to username and password</li>
+      <li>For these usernames, password is <b>demo</b>
+        <ul>
+          {% for u in regular_users %}
+            <li><b class="username" data-pass="demo">{{ u.username }}</b> a.k.a. <i>{{ u.first_name }} {{ u.last_name }}</i>
+            {% if u.last_name == "Bluth" %}&larr; has disguise experience{% endif %}
+          </li>{% endfor %}
+        </ul>
+      </li>
+      <li>Disguise functionality is available for <b class="username" data-pass="admin">admin</b> user and for all ones with the lastname <b>Bluth</b></li>
     </ul>
-
+    </div>
   </div>
+</div>
+
+
+  <script>
+document.querySelectorAll('b.username').forEach((tag) => {
+  tag.addEventListener('click', (e) => {
+    document.querySelector('#id_password').value = tag.getAttribute('data-pass');
+    document.querySelector('#id_username').value = tag.textContent;
+    document.querySelector('#id_username').focus();
+  })
+})
+  </script>
 
 </div>
 {% endblock %}
