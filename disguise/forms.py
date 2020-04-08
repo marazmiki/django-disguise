@@ -44,7 +44,11 @@ class DisguiseForm(forms.Form):
         """
         Returns a selected user instance
         """
-        assert self.is_valid()
+        if not self.is_valid():
+            raise RuntimeError(
+                'The `get_user() method should be called only '
+                'the form is valid'
+            )
         return next((v for k, v in self.cleaned_data.items() if v), None)
 
 
