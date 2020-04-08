@@ -52,12 +52,14 @@ def swap_user(request, old_user, new_user):
     if new_user == request.original_user:
         disguise_removed.send(sender=get_user_model(),
                               original_user=request.original_user,
-                              disguised_in_user=old_user)
+                              disguised_in_user=old_user,
+                              request=request)
     else:
         disguise_applied.send(sender=get_user_model(),
                               original_user=request.original_user,
                               old_user=old_user,
-                              new_user=new_user,)
+                              new_user=new_user,
+                              request=request)
 
 
 def create_perms(*args, **kwargs):

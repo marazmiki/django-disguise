@@ -8,10 +8,6 @@ DISGUISE_MIDDLEWARE = 'disguise.middleware.DisguiseMiddleware'
 REQUEST_CONTEXT_PROCESSOR = 'django.template.context_processors.request'
 
 
-class DisguiseTag(checks.Tags):
-    pass
-
-
 def sessions_app_installed():
     return SESSIONS_APP in settings.INSTALLED_APPS
 
