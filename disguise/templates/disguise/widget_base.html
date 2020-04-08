@@ -1,0 +1,73 @@
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% if can_disguise %}
+    {% block css_head %}
+      <style>
+        #disguise {
+          display: block;
+          position: fixed;
+          top: 30px;
+          right: 30px;
+          border: #ddd 0px solid;
+          background: #f5f5f5;
+          opacity: 0.6;
+          border-radius: 15px;
+          padding: 20px;
+        }
+        #disguise:hover {
+          opacity: 1;
+        }
+      </style>
+    {% endblock css_head %}
+
+    {% block widget_main %}
+    <!-- disguise widget -->
+    <div id="disguise">
+      {% block row_logged_as %}
+        <p>
+          {{ _('Logged as') }} <b>{{ request.user }}</b> <code>[id={{ request.user.pk }}]</code>
+          {% if request.original_user != request.user %}
+            [<a href="{% url 'disguise_unmask' %}">{{  _('Unmask') }}</a>]
+          {% endif %}
+        </p>
+      {% endblock row_logged_as %}
+      {% block row_original_user %}
+        {% if request.original_user != request.user %}
+          <p>
+            {{ _('Actually, you are') }} <b>{{ request.original_user }}</b> <code>[id={{ request.original_user.pk }}]</code>
+          </p>
+        {% endif %}
+        {% endblock row_original_user %}
+    {% block form %}
+      <form method="post" action="{% url 'disguise_mask' %}">
+        {% csrf_token %}
+        {% block form_render %}
+          {{ form.as_p }}
+        {% endblock form_render %}
+        {% block form_submit %}
+          <p>
+            <input type="submit" value="{{ _('Disguise') }}">
+          </p>
+        {% endblock form_submit %}
+      </form>
+      {% endblock form %}
+    </div>
+    {% endblock widget_main %}
+
+    {% block js_foot %}
+    <script>
+    {
+      const root = document.querySelector('#disguise');
+      root.addEventListener('click', (e) => {
+        if (['A', 'INPUT', 'SELECT', 'OPTION'].indexOf(e.target.tagName) > -1) {
+
+        }
+        console.log(e, e.target)
+      })
+    }
+    </script>
+    {% endblock js_foot %}
+  {% endif %}
+{% endblock content %}
