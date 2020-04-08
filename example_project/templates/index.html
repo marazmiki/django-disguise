@@ -2,7 +2,11 @@
 {% load disguise_tags %}
 
 {% block content %}
+
   {% disguise_widget %}
+  {% for message in messages %}
+  <div class="alert alert-success {{ message.tags }}" role="alert">{{ message }}</div>
+  {% endfor %}
   <h2>Users here</h2>
   <p>
   {% if user.is_authenticated %}
