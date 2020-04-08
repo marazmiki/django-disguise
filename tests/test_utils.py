@@ -15,13 +15,11 @@ from example_project.stuff import my_own_can_disguise
         ('staff_user_with_perm', True),
     ]
 )
-def test_can_disguise_default_bahavior(
-        settings, rf, django_user_model,
+def test_can_disguise_default_behavior(
+        rf, django_user_model,
         regular_user, super_user,
         expected, user_type
 ):
-    settings.DISGUISE['can_disguise'] = ('example_project.stuff.'
-                                         'test_can_disguise')
     user = regular_user
 
     if user_type == 'superuser':
