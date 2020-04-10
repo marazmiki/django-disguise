@@ -2,26 +2,36 @@
 django-disguise
 ===============
 
-.. image:: https://badge.fury.io/py/django-disguise.png
-    :target: http://badge.fury.io/py/django-disguise
+.. image:: https://travis-ci.org/marazmiki/django-disguise.svg?branch=master
+     :target: https://travis-ci.org/marazmiki/django-disguise
+     :alt: Travis CI building status
 
-.. image:: https://travis-ci.org/marazmiki/django-disguise.png?branch=master
-    :target: https://travis-ci.org/marazmiki/django-disguise
+.. image:: https://coveralls.io/repos/github/marazmiki/django-disguise/badge.svg?branch=master
+     :target: https://coveralls.io/github/marazmiki/django-disguise?branch=master
+     :alt: Code coverage status
 
-.. image:: https://coveralls.io/repos/marazmiki/django-disguise/badge.png?branch=master
-    :target: https://coveralls.io/r/marazmiki/django-disguise?branch=master
-
-.. image:: https://pypip.in/d/django-disguise/badge.png
-    :target: https://pypi.python.org/pypi/django-disguise
-
-.. image:: https://pypip.in/d/django-disguise/badge.png
-    :target: https://pypi.python.org/pypi/django-disguise
-    :alt: Latest version on PyPI
-
+.. image:: https://badge.fury.io/py/django-disguise.svg
+     :target: http://badge.fury.io/py/django-disguise
+     :alt: PyPI release
 
 .. image:: https://pypip.in/wheel/django-disguise/badge.svg
-    :target: https://pypi.python.org/pypi/django-disguise/
-    :alt: Wheel Status
+     :target: https://pypi.python.org/pypi/django-disguise/
+     :alt: Wheel Status
 
+.. image:: https://img.shields.io/pypi/pyversions/django-disguise.svg
+     :target: https://img.shields.io/pypi/pyversions/django-disguise.svg
+     :alt: Supported Python versions
 
+.. image:: https://img.shields.io/pypi/djversions/django-disguise.svg
+     :target: https://pypi.python.org/pypi/django-disguise/
+     :alt: Supported Django versions
 
+.. image:: https://readthedocs.org/projects/django-disguise/badge/?version=latest
+     :target: https://django-disguise.readthedocs.io/ru/latest/?badge=latest
+     :alt: Documentation Status
+
+This application allows a site superuser (or some staff user authorized for
+the action) to *disguise* into an arbitrary user without knowing its password and without losing the original session.
+
+Please see the full documentation on `RTFD <https://django-disguise.readthedocs.io/latest/>`_.
+Or you can see it in action on the `DEMO site <https://django-disguise.herokuapp.com>`_.
