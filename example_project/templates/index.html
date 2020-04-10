@@ -19,6 +19,7 @@
         <th>ID</th>
         <th>Real name</th>
         <th>Username</th>
+        <th>Last access</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -28,6 +29,7 @@
         <td>{{ user.id }}</td>
         <td>{{ user.first_name }} {{ user.last_name }}</td>
         <td>@{{ user.username }}</td>
+        <td>{{ user.last_login|default:"Never" }}</td>
         <td>
           {% if request|can_disguise %}
             <a href="{% url 'disguise_mask' pk=user.id %}"><i class="fas fa-mask"></i> @{{ user.username }}</a>

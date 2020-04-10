@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 
 import pytest
+from django.contrib.auth.signals import user_logged_in
 
 from disguise.signals import disguise_applied, disguise_removed
 
@@ -127,10 +128,39 @@ def test_signal_diguise_disapplied(client, super_user, regular_user, mask_url):
     client.force_login(super_user)
 
     def diguise_disapplied_handler(*args, **kwargs):
-        print('disguise DIZapplied', args, kwargs)
-        # self.assertEquals(original_user, self.root)
-        # self.assertEquals(old_user, self.user)
+        assert kwargs['original_user'] == super_user
 
     with catch_signal(disguise_removed, diguise_disapplied_handler):
         resp = client.post(mask_url, {'user_id': regular_user.id}, follow=True)
         assert resp.context['request'].original_user == super_user
+
+
+def test_user_logged_in_signal_does_not_fires_when_making_a_disguise(
+        client, super_user, regular_user, mask_url, django_user_model
+):
+    def honeypot_handler(*args, **kwargs):
+        "A handler crashes everything"
+        raise RuntimeError('Gotcha!')
+
+    # First, login as a superuser
+    client.force_login(super_user)
+
+    # Assuming, regular_user never logged in
+    regular_user.last_login = None
+    regular_user.save(update_fields=['last_login'])
+
+    # Then add a signal that crashes everything!
+    user_logged_in.connect(
+        receiver=honeypot_handler,
+        sender=django_user_model,
+        dispatch_uid='break_all'
+    )
+
+    # Making a disguise
+    resp = client.post(mask_url, {'user_id': regular_user.id}, follow=True)
+    assert resp.context['request'].original_user == super_user
+
+    # Oops, looks like nothing terrible happened ;)
+    # Make sure, regular_user.last_login still None
+    regular_user.refresh_from_db()
+    assert regular_user.last_login is None

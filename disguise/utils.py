@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.models import Permission
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
@@ -39,7 +40,10 @@ def swap_user(request, old_user, new_user):
     request.session[SESSION_KEY] = new_user.id
     request.session[BACKEND_SESSION_KEY] = new_user.backend
 
+    receivers = user_logged_in.receivers
+    user_logged_in.receivers = []
     login(request, new_user)
+    user_logged_in.receivers = receivers
 
     if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
