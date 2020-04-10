@@ -1,11 +1,22 @@
 Changes
 =======
+1.0.0
+-----
+
+* Using ``poetry`` to build the package;
+* Support for ``Python 2.7`` and ``Python 3.4+``;
+* Support for ``Django 1.11``, ``Django 2.x`` and ``Django 3.x``;
+* Use ``pytest`` for tests;
+* Added a project configuration self checking mechanism using the  ``Django``'s ``check`` framework;
+* Make the app configurable (able to customize a widget form and ``can_disguise`` behavior);
+* Changed signal names and signatures to more suitable;
+* Does not send ``user_logged_in`` signal when swapping a user;
 
 0.2.3
 -----
 
 * Use ``tox`` for testing
-* Drop suuport for ``Django==1.4``
+* Drop support for ``Django==1.4``
 
 
 0.2.2
