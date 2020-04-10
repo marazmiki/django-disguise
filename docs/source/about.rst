@@ -1,8 +1,8 @@
 About
 =====
 
-This application allows to a site superuser (or a some staff user authorized for the action)
-to *disguise* into an arbitrary user **without knowing own's password and without losing the original session**.
+This application allows a site superuser (or some staff user authorized for the action)
+to *disguise* into an arbitrary user **without knowing its password and without losing the original session**.
 
 Why "disguise"?
 ---------------
@@ -16,10 +16,10 @@ having own abilities, e.g.
 
 * ``Medic`` can repair damages,
 * ``Scout`` runs so fast
-* ``Sniper`` has a riffle...
+* ``Sniper`` has a rifle...
 
-Also there is a wonderful player class called ``Spy``, who has an ability
-to take a shape of any other class. Everybody sees a running blue scout while
+Also, there is a wonderful player class called ``Spy``, who has the ability
+to take the shape of any other class. Everybody sees a running blue scout while
 actually it's a Red Spy.
 
 You can view a short movie, it's quite funny.
