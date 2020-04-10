@@ -27,7 +27,7 @@ django-disguise
      :alt: Supported Django versions
 
 .. image:: https://readthedocs.org/projects/django-disguise/badge/?version=latest
-     :target: https://django-disguise.readthedocs.io/ru/latest/?badge=latest
+     :target: https://django-disguise.readthedocs.io/en/latest/?badge=latest
      :alt: Documentation Status
 
 This application allows a site superuser (or some staff user authorized for
