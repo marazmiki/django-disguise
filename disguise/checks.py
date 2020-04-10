@@ -1,3 +1,6 @@
+import logging
+
+from django import forms
 from django.conf import settings
 from django.core import checks
 from django.utils.module_loading import import_string
@@ -6,6 +9,8 @@ SESSIONS_APP = 'django.contrib.sessions'
 SESSIONS_MIDDLEWARE = 'django.contrib.sessions.middleware.SessionMiddleware'
 DISGUISE_MIDDLEWARE = 'disguise.middleware.DisguiseMiddleware'
 REQUEST_CONTEXT_PROCESSOR = 'django.template.context_processors.request'
+
+log = logging.getLogger(__name__)
 
 
 def sessions_app_installed():
@@ -45,13 +50,54 @@ def disguise_settings():
 
 
 def custom_can_disguise():
-    custom_func = getattr(settings, 'DISGUISE', {}).get('can_disguise')
-    if custom_func is None:
+    custom_disguise = getattr(settings, 'DISGUISE', None)
+    if custom_disguise is None:
+        return True
+    if not isinstance(custom_disguise, dict):
+        log.debug('E007: DISGUISE not a dict, but %s', type(custom_disguise))
+        return False
+    func_path = settings.DISGUISE.get('can_disguise')
+    if func_path is None:
+        log.debug('E007: can_disguise not defined')
         return True
     try:
-        import_string(custom_func)
-        return True
+        func = import_string(func_path)
+        if callable(func):
+            return True
+        else:
+            log.debug('E007: %s is not callable', func_path)
+            return False
     except ImportError:
+        log.debug('E007: %s is not importable')
+        return False
+
+
+def custom_widget_form():
+    config = getattr(settings, 'DISGUISE', None)
+    if config is None:
+        return True
+    if not isinstance(config, dict):
+        log.debug('E008: DISGUISE not a dict, but %s', type(config))
+        return False
+    widget_form_path = settings.DISGUISE.get('widget_form')
+    if widget_form_path is None:
+        log.debug('E008: `widget_form` not defined')
+        return True
+    try:
+        form_class = import_string(widget_form_path)
+        if issubclass(form_class, forms.Form):
+            if hasattr(form_class, 'get_user') and \
+                    callable(form_class.get_user):
+                return True
+            else:
+                log.debug('E008: Django form you provided does not '
+                          'implement get_user() method')
+                return False
+        else:
+            log.debug('E007: %s is not a Django form class', widget_form_path)
+            return False
+    except ImportError:
+        log.debug('E008: invalid `widget_form`: %s is not importable')
         return False
 
 
@@ -125,6 +171,20 @@ def check_env(*args, **kwargs):
                 hint=(
                     'Please the full path to the function you want to use to '
                     'and make sure it is a callable object.'
+                )
+            )
+        )
+    if not custom_widget_form():
+        errors.append(
+            checks.Error(
+                (
+                    'Custom `widget_form` you specified is not a '
+                    'Django Form class with get_user() method defined'
+                ),
+                id='disguise.E008',
+                hint=(
+                    'Make sure you pick on an existing class inherited from '
+                    'django.forms.Form and has the get_user() method defined'
                 )
             )
         )

@@ -6,3 +6,7 @@ def my_own_can_disguise(request):
 def test_can_disguise(request):
     from disguise.utils import can_disguise_default_behavior
     return can_disguise_default_behavior(request)
+
+
+# should be!
+__all__ = ['my_own_can_disguise', 'test_can_disguise']

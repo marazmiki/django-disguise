@@ -2,10 +2,20 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from . import conf
+
 User = get_user_model()
 
 
-class DisguiseForm(forms.Form):
+class DisguiseFormBase(forms.Form):
+    def get_user(self):
+        """
+        Returns a selected user instance
+        """
+        raise NotImplementedError()
+
+
+class DisguiseForm(DisguiseFormBase):
     username = forms.CharField(label=_('User name'), required=False)
     user_id = forms.IntegerField(label=_('User ID'), required=False)
 
@@ -53,4 +63,6 @@ class DisguiseForm(forms.Form):
 
 
 def get_disguise_form_class():
-    return DisguiseForm
+    if not conf.CUSTOMIZED_WIDGET_FORM_CLASS:
+        return DisguiseForm
+    return conf.CUSTOMIZED_WIDGET_FORM_CLASS
