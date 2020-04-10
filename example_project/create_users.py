@@ -23,7 +23,7 @@ def create_random_person():
     first_name = random.choice(first_names)
     last_name = random.choice(last_names)
     username = (first_name.lower() + '_' + last_name.lower()).replace(' ', '_')
-    email = f'{username}@example.com'
+    email = username + '@example.com'
 
     return {
         'first_name': first_name,
