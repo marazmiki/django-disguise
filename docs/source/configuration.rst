@@ -25,9 +25,9 @@ Make sure ``django.contrib.sessions.middleware.SessionMiddleware`` in there and 
 
     ]
 
-.. code:: python
-
 Here you can see an example of overriding of the default behavior
+
+.. code:: python
 
     # settings.py
     DISGUISE = {
