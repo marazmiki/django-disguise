@@ -33,5 +33,5 @@ django-disguise
 This application allows a site superuser (or some staff user authorized for
 the action) to *disguise* into an arbitrary user without knowing its password and without losing the original session.
 
-Please see the full documentation on `RTFD <https://django-disguise.readthedocs.io/latest/>`_.
-Or you can see it in action on the `DEMO site <https://django-disguise.herokuapp.com>`_.
+* See the full documentation on `RTFD <https://django-disguise.readthedocs.io/latest/>`_.
+* Look it in action on the `DEMO site <https://django-disguise.herokuapp.com>`_.
