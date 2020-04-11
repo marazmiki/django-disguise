@@ -1,8 +1,8 @@
 Configuration
 =============
 
-Settings
---------
+Modifying the settings module
+-----------------------------
 
 .. code:: python
 
@@ -36,8 +36,8 @@ Here you can see an example of overriding of the default behavior
     }
 
 
-urls.py
--------
+Modifying urlpatterns
+---------------------
 
 .. code:: python
 
@@ -49,6 +49,21 @@ urls.py
     urlpatterns = [
         #...
         path('disguise/', include('disguise.urls')),
+
+
+Adding widgets to templates
+---------------------------
+
+If you plan to use the widget, you should add these lines into templates of
+pages where you want to:
+
+.. code:: django
+
+    {% load disguise_tags %}
+    {% disguise_widget %}
+
+A good idea to add this code into your base template (generally, it
+called ``base.html``) to make the ability to use the application on any√ page.
 
 
 migration
