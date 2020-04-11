@@ -15,6 +15,9 @@ i18n:
 deploy:
 	git push heroku master
 
+.PHONY: sphinx
+sphinx:
+	cd docs && make livehtml
 
 .PHONY: test
 test:
