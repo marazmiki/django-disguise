@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-10 17:44+0000\n"
+"POT-Creation-Date: 2020-06-06 18:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,15 +30,23 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
-#: disguise/forms.py:29
+#: disguise/forms.py:28
 msgid "No such username"
 msgstr ""
 
-#: disguise/forms.py:38
+#: disguise/forms.py:30
+msgid "The user seems be an inactive one"
+msgstr ""
+
+#: disguise/forms.py:39
 msgid "No such user id"
 msgstr ""
 
-#: disguise/forms.py:49
+#: disguise/forms.py:41
+msgid "The user with this ID seems be an inactive one"
+msgstr ""
+
+#: disguise/forms.py:54
 msgid "Please enter either username or user id"
 msgstr ""
 
@@ -58,3 +66,22 @@ msgstr ""
 msgid "Can disguise"
 msgstr ""
 
+#: example_project/templates/base.html:16
+msgid "sign out"
+msgstr ""
+
+#: example_project/templates/base.html:18
+msgid "sign in"
+msgstr ""
+
+#: example_project/templates/login.html:19
+msgid "Please correct the error below."
+msgstr ""
+
+#: example_project/templates/login.html:21
+msgid "Please correct the errors below."
+msgstr ""
+
+#: example_project/templates/login.html:45
+msgid "Log in"
+msgstr ""
