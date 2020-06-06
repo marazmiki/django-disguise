@@ -4,6 +4,13 @@ Change log
 1.x
 ---
 
+1.0.1
+~~~~~
+
+* Added form errors handling
+* Fixed a bug when trying to switch a disabled user
+* Updated ``RU`` locales
+
 1.0.0
 ~~~~~
 
