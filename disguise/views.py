@@ -29,6 +29,8 @@ class DisguiseMixin(UserPassesTestMixin):
 
 
 class Mask(DisguiseMixin, generic.FormView):
+    template_name = 'disguise/form.html'
+
     def get_form_class(self):
         return get_disguise_form_class()
 

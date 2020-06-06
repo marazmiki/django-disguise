@@ -23,19 +23,24 @@ class DisguiseForm(DisguiseFormBase):
         username = self.cleaned_data.get('username')
         if not username:
             return None
-        qset = User.objects.filter(username=username)
-        if qset.exists():
-            return qset.get()
-        raise forms.ValidationError(_('No such username'))
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            raise forms.ValidationError(_('No such username'))
+        if not user.is_active:
+            raise forms.ValidationError(_('The user seems be an inactive one'))
+        return user
 
     def clean_user_id(self):
         user_id = self.cleaned_data.get('user_id')
         if not user_id:
             return None
-        qset = User.objects.filter(pk=user_id)
-        if qset.exists():
-            return qset.get()
-        raise forms.ValidationError(_('No such user id'))
+        user = User.objects.filter(pk=user_id).first()
+        if user is None:
+            raise forms.ValidationError(_('No such user id'))
+        if not user.is_active:
+            raise forms.ValidationError(_('The user with this ID seems be '
+                                          'an inactive one'))
+        return user
 
     def clean(self):
         """

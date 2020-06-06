@@ -65,7 +65,7 @@ def test_anonymous_access(client, regular_user, mask_url):
     assert resp.status_code == 403
 
 
-def test_non_privilegied_access(
+def test_non_privileged_access(
         client, regular_user, super_user, mask_url
 ):
     client.force_login(regular_user)
@@ -164,3 +164,36 @@ def test_user_logged_in_signal_does_not_fires_when_making_a_disguise(
     # Make sure, regular_user.last_login still None
     regular_user.refresh_from_db()
     assert regular_user.last_login is None
+
+
+@pytest.mark.parametrize('field', ['user_id', 'username'])
+def test_regression_cannot_swap_user_to_disabled_one(
+    mask_url, client, super_user, regular_user, field
+):
+    client.force_login(super_user)
+
+    regular_user.is_active = False
+    regular_user.save(update_fields=['is_active'])
+
+    resp = client.post(mask_url, {
+        'user_id': {'user_id': regular_user.id},
+        'username': {'username': regular_user.username}
+    }[field], follow=True)
+
+    assert not resp.context['form'].is_valid()
+    assert field in resp.context['form'].errors
+
+
+@pytest.mark.parametrize('field', ['user_id', 'username'])
+def test_regression_cannot_swap_user_to_non_existing_one(
+    mask_url, client, super_user, field
+):
+    client.force_login(super_user)
+
+    resp = client.post(mask_url, {
+        'user_id': {'user_id': 100500},
+        'username': {'username': 'a-person-who-does-not-exist'}
+    }[field], follow=True)
+
+    assert not resp.context['form'].is_valid()
+    assert field in resp.context['form'].errors
