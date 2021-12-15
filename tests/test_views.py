@@ -1,8 +1,15 @@
 from contextlib import contextmanager
 
 import pytest
+from django.contrib.auth.signals import user_logged_in
 
-from disguise.signals import disguise_applied, disguise_disapplied
+from disguise.signals import disguise_applied, disguise_removed
+
+
+@pytest.fixture(autouse=True)
+def fix_settings(settings):
+    settings.DISGUISE['can_disguise'] = ('example_project.stuff.'
+                                         'test_can_disguise')
 
 
 @pytest.fixture
@@ -19,7 +26,7 @@ def mask_url():
 @pytest.fixture
 def unmask_url():
     "A URL that drops the mask from a user off"
-    return '/disguise/unmask/'
+    return '/disguise/remove/'
 
 
 @contextmanager
@@ -55,15 +62,15 @@ def test_if_user_can_see_disquise_form(
 def test_anonymous_access(client, regular_user, mask_url):
     client.logout()
     resp = client.post(mask_url, {'username': regular_user.username})
-    assert resp.status_code == 302
+    assert resp.status_code == 403
 
 
-def test_non_privilegied_access(
+def test_non_privileged_access(
         client, regular_user, super_user, mask_url
 ):
     client.force_login(regular_user)
     resp = client.post(mask_url, {'username': super_user.username})
-    assert resp.status_code == 302
+    assert resp.status_code == 403
 
 
 def test_mask_myself(client, mask_url, super_user, regular_user):
@@ -121,10 +128,72 @@ def test_signal_diguise_disapplied(client, super_user, regular_user, mask_url):
     client.force_login(super_user)
 
     def diguise_disapplied_handler(*args, **kwargs):
-        print('disguise DIZapplied', args, kwargs)
-        # self.assertEquals(original_user, self.root)
-        # self.assertEquals(old_user, self.user)
+        assert kwargs['original_user'] == super_user
 
-    with catch_signal(disguise_disapplied, diguise_disapplied_handler):
+    with catch_signal(disguise_removed, diguise_disapplied_handler):
         resp = client.post(mask_url, {'user_id': regular_user.id}, follow=True)
         assert resp.context['request'].original_user == super_user
+
+
+def test_user_logged_in_signal_does_not_fires_when_making_a_disguise(
+        client, super_user, regular_user, mask_url, django_user_model
+):
+    def honeypot_handler(*args, **kwargs):
+        "A handler crashes everything"
+        raise RuntimeError('Gotcha!')
+
+    # First, login as a superuser
+    client.force_login(super_user)
+
+    # Assuming, regular_user never logged in
+    regular_user.last_login = None
+    regular_user.save(update_fields=['last_login'])
+
+    # Then add a signal that crashes everything!
+    user_logged_in.connect(
+        receiver=honeypot_handler,
+        sender=django_user_model,
+        dispatch_uid='break_all'
+    )
+
+    # Making a disguise
+    resp = client.post(mask_url, {'user_id': regular_user.id}, follow=True)
+    assert resp.context['request'].original_user == super_user
+
+    # Oops, looks like nothing terrible happened ;)
+    # Make sure, regular_user.last_login still None
+    regular_user.refresh_from_db()
+    assert regular_user.last_login is None
+
+
+@pytest.mark.parametrize('field', ['user_id', 'username'])
+def test_regression_cannot_swap_user_to_disabled_one(
+    mask_url, client, super_user, regular_user, field
+):
+    client.force_login(super_user)
+
+    regular_user.is_active = False
+    regular_user.save(update_fields=['is_active'])
+
+    resp = client.post(mask_url, {
+        'user_id': {'user_id': regular_user.id},
+        'username': {'username': regular_user.username}
+    }[field], follow=True)
+
+    assert not resp.context['form'].is_valid()
+    assert field in resp.context['form'].errors
+
+
+@pytest.mark.parametrize('field', ['user_id', 'username'])
+def test_regression_cannot_swap_user_to_non_existing_one(
+    mask_url, client, super_user, field
+):
+    client.force_login(super_user)
+
+    resp = client.post(mask_url, {
+        'user_id': {'user_id': 100500},
+        'username': {'username': 'a-person-who-does-not-exist'}
+    }[field], follow=True)
+
+    assert not resp.context['form'].is_valid()
+    assert field in resp.context['form'].errors

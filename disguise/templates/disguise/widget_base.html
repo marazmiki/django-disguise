@@ -1,0 +1,166 @@
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% if can_disguise %}
+    {% block css_head %}
+      <style>
+        #disguise {
+          display: block;
+          position: fixed;
+          top: 30px;
+          right: 0;
+          opacity: 0.6;
+          padding: 0;
+        }
+
+        #disguise:hover {
+          opacity: 1;
+        }
+
+        #disguise-payload {
+          display: block;
+          border: #ddd 0px solid;
+          background: #f5f5f5;
+          border-radius: 15px;
+          padding: 20px;
+          margin-right: 30px;
+        }
+
+        #disguise-chevron {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          transform: rotate(-90deg);
+          background: #888888;
+          height: 30px;
+          margin: 0;
+          touch-action: none;
+          user-select: none;
+        }
+
+        #disguise-chevron:active {
+          background-color: rgba(168, 218, 220, 1.00);
+        }
+        #disguise-chevron:hover {
+          cursor: pointer;
+        }
+
+      </style>
+    {% endblock css_head %}
+
+    {% block widget_main %}
+    <!-- disguise widget -->
+    <div id="disguise">
+      {% block chevron %}
+        <div id="disguise-chevron">{{ _('Disguise') }}</div>
+      {% endblock chevron %}
+
+      {% block payload %}
+        <div id="disguise-payload">
+        {% block row_logged_as %}
+          <p>
+            {{ _('Logged as') }} <b>{{ request.user }}</b> <code>[id={{ request.user.pk }}]</code>
+            {% if request.original_user != request.user %}
+              [<a href="{% url 'disguise_unmask' %}">{{  _('Unmask') }}</a>]
+            {% endif %}
+          </p>
+        {% endblock row_logged_as %}
+        {% block row_original_user %}
+          {% if request.original_user != request.user %}
+            <p>
+              {{ _('Actually, you are') }} <b>{{ request.original_user }}</b> <code>[id={{ request.original_user.pk }}]</code>
+            </p>
+          {% endif %}
+          {% endblock row_original_user %}
+        {% block form %}
+          <form method="post" action="{% url 'disguise_mask' %}">
+            {% csrf_token %}
+            {% block form_render %}
+              {{ form.as_p }}
+            {% endblock form_render %}
+            {% block form_submit %}
+              <p>
+                <input type="submit" value="{{ _('Disguise') }}">
+              </p>
+            {% endblock form_submit %}
+          </form>
+        {% endblock form %}
+        </div>
+      {% endblock payload %}
+    </div>
+    {% endblock widget_main %}
+
+    {% block js_foot %}
+    <script>
+    // @TODO: look on that https://www.kirupa.com/html5/drag.htm
+    {
+      const root      = document.querySelector('#disguise');
+      const payload   = document.querySelector('#disguise-payload');
+      const chevron   = document.querySelector('#disguise-chevron');
+      const container = document.querySelector('body');
+
+      let active = false;
+      let currentY;
+      let initialY;
+      let yOffset = 0;
+
+      // Toggles visibility of the payload screen
+      const toggle = () => {
+        payload.style.visibility = (payload.style.visibility === 'visible') ? 'hidden': 'visible';
+      };
+
+      chevron.addEventListener('click', toggle);
+      payload.addEventListener('click', (e) => {
+        if (['A', 'INPUT', 'SELECT', 'OPTION'].indexOf(e.target.tagName) > -1) {
+          console.log('right items click')
+          return true;
+        }
+        console.log('toggle the visibility')
+        // console.log(e, e.target)
+        toggle()
+      });
+
+
+
+      container.addEventListener("touchstart", dragStart, false);
+      container.addEventListener("touchend", dragEnd, false);
+      container.addEventListener("touchmove", drag, false);
+
+      container.addEventListener("mousedown", dragStart, false);
+      container.addEventListener("mouseup", dragEnd, false);
+      container.addEventListener("mousemove", drag, false);
+
+      function dragStart(e) {
+        if (e.type === "touchstart") {
+          initialY = e.touches[0].clientY - yOffset;
+        } else {
+          initialY = e.clientY - yOffset;
+        }
+        if (e.target === chevron) {
+          active = true;
+        }
+      }
+
+      function dragEnd(e) {
+        initialY = currentY;
+        active = false;
+      }
+
+      function drag(e) {
+        if (active) {
+          e.preventDefault();
+          if (e.type === "touchmove") {
+            currentY = e.touches[0].clientY - initialY;
+          } else {
+            currentY = e.clientY - initialY;
+          }
+          yOffset = currentY;
+          root.style.top = `${yOffset}px`;
+        }
+      }
+    }
+    </script>
+    {% endblock js_foot %}
+  {% endif %}
+{% endblock content %}
