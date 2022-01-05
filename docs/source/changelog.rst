@@ -4,7 +4,8 @@ Change log
 1.x
 ---
 
-1.1
+
+1.2
 ~~~
 
 * Added support for ``Django 4.x`` and ``Python 3.10``
