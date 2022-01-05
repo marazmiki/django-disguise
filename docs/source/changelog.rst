@@ -4,6 +4,14 @@ Change log
 1.x
 ---
 
+1.1
+~~~
+
+* Added support for ``Django 4.x`` and ``Python 3.10``
+* Dropped support for ``Python 3.5`` and older
+* Get rid of Travis CI in favor of GitHub Actions
+* Updated test dependencies
+
 1.0.1
 ~~~~~
 

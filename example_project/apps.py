@@ -6,7 +6,9 @@ class ExampleProjectApp(apps.AppConfig):
 
     def ready(self):
         from django.contrib.auth import get_user_model
+
         from disguise.signals import disguise_applied, disguise_removed
+
         from . import signal_handlers
 
         disguise_applied.connect(

@@ -6,6 +6,10 @@ from disguise.utils import can_disguise, create_perms
 from example_project.stuff import my_own_can_disguise
 
 
+def get_response(*args, **kwargs):
+    print(args, kwargs)
+
+
 @pytest.mark.parametrize(
     argnames='user_type, expected',
     argvalues=[
@@ -37,7 +41,7 @@ def test_can_disguise_default_behavior(
 
     request = rf.get('/')
     request.user = user
-    SessionMiddleware().process_request(request)
+    SessionMiddleware(get_response).process_request(request)
     request.session.save()
 
     assert can_disguise(request) is expected
@@ -61,7 +65,7 @@ def test_can_disguise_custom_behavior(rf, regular_user,
     request.user = regular_user
     regular_user.last_name = last_name
     regular_user.save()
-    SessionMiddleware().process_request(request)
+    SessionMiddleware(get_response).process_request(request)
     request.session.save()
 
     assert can_disguise(request) is can

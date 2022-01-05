@@ -27,3 +27,22 @@ release:
 	python setup.py sdist --format=zip,bztar,gztar register upload
 	python setup.py bdist_wheel register upload
 
+###############################################################################
+# Bumpversion targets                                                         #
+###############################################################################
+
+.PHONY: patch-version
+patch-version:
+	bump2version patch
+
+.PHONY: minor-version
+minor-version:
+	bump2version minor
+
+.PHONY: major-version
+major-version:
+	bump2version major
+
+.PHONY: test-bumpversion
+test-bumpversion:
+	bump2version patch --dry-run --verbose --allow-dirty
