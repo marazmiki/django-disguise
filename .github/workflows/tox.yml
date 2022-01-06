@@ -28,7 +28,7 @@ jobs:
       run: tox -- --cov-report=xml
 
     - name: Run coveralls
-      run: converalls
+      run: coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
