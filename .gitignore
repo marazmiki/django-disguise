@@ -13,3 +13,4 @@ dist/
 *.sqlite3
 .idea/
 .python-version
+coverage.xml
